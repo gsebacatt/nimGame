@@ -126,6 +126,8 @@ export function alphaBetaPruning(game, depth, alpha, beta, isMax){
 
             console.log(game)
 
+            //Esto se hace para obtener el score de esta jugada
+            //El objetivo de la poda es evitar buscar un score de antemano
             let result = alphaBetaPruning( game, depth - 1,alpha, beta, !isMax);
 
             move.score = result.score;

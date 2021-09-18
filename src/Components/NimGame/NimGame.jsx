@@ -13,6 +13,8 @@ export default class NimGame extends Component {
             currentRow: null,
             errorMessage: null,
             aiTurn: false,
+            gameDone: false,
+            result: null,
         }
     }
 
@@ -86,7 +88,15 @@ export default class NimGame extends Component {
                     currentRow: row,
                     gameState: list,
                 }
+            }, () => {
+                //Finalmente controlar el estado del juego
+                if (this.gameFinished()) {
+                    this.setState({
+                        result: "Has ganado la partida",
+                    })
+                }
             })
+
         } else {
             this.setState({
                 errorMessage: "Solo puede eliminar de la misma fila",
@@ -101,7 +111,7 @@ export default class NimGame extends Component {
             currentRow: null,
             errorMessage: "",
             aiTurn: true,
-        }, () =>{
+        }, () => {
             //Ejecutar llamada a algoritmo, inicialmente minimax, luego parametrizado
             let bestMove = minimaxDepth(this.state.gameState, 3, true);
             //let bestMove = alphaBetaPruning(this.state.gameState,-10000,+10000, 3, true);
@@ -114,11 +124,15 @@ export default class NimGame extends Component {
                     gameState: list,
                     aiTurn: false,
                 }
+            }, () => {
+                if (this.gameFinished()) {
+                    this.setState({
+                        result: "IA gana la partida",
+                    })
+                }
             })
 
-        //Finalmente desbloquear boton para nueva jugada de usuario
-            //Controlar estado del juego
-    })
+        })
 
     }
 
@@ -127,6 +141,19 @@ export default class NimGame extends Component {
             linesNumber: 0,
             gameState: [],
         })
+    }
+
+    gameFinished = () => {
+        let sum = 0;
+        this.state.gameState.forEach(line => {
+            sum += line;
+        })
+        console.log(sum)
+        if (sum === 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
@@ -138,7 +165,7 @@ export default class NimGame extends Component {
                 <div id='selection'>
                     Numero de Lineas :
                 </div>
-                <input type="number" id="linesNumber" onChange={this.submitLines}/>
+                <input type="number" id="linesNumber" onChange={this.submitLines} value={this.state.linesNumber}/>
 
                 {this.state.linesNumber > 0 && (
                     <>
@@ -150,6 +177,7 @@ export default class NimGame extends Component {
                                 onClick={this.playAi}>Jugar
                         </button>
                         <button className={"hover"} disabled={!aiTurn}>IA</button>
+                        <button className={"hover"} onClick={this.resetGame}>Reset</button>
                     </>
                 )}
 
@@ -158,6 +186,7 @@ export default class NimGame extends Component {
 
 
                 <div id='result'>
+                    {this.state.result}
                 </div>
 
                 <div id="error" style={{color: "red"}}>

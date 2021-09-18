@@ -140,6 +140,7 @@ export default class NimGame extends Component {
         this.setState({
             linesNumber: 0,
             gameState: [],
+            result: null,
         })
     }
 

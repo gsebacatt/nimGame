@@ -1,0 +1,97 @@
+body {
+	background-color: #E0E4CC;
+	font-family: 'Montserrat', sans-serif;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+h1 {
+	font-size: 3em;
+}
+
+table {
+	width: 75%;
+	margin: auto;
+	margin-top: 20px;
+	font-family: 'Arimo', sans-serif;
+	font-size: 70px;
+}
+
+td {
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	line-height: 80px;
+	background-color: #69D2E7;
+	color: white;
+	border: none;
+	border-radius: 10%;
+	box-shadow: 0 .03em .08em rgba(0,0,0, 0.5);
+	margin: 8px;
+	transition: background-color 0.2s ease;
+}
+
+td:hover {
+	cursor: pointer;
+	background-color: #FA6900;
+}
+
+.selected {
+	background-color: #FA6900;
+}
+
+tr {
+	list-style-type: none;
+	width: 500px;
+}
+
+#selection {
+	height: 60px;
+	font-size: 1.5em;
+}
+
+button {
+	border: none;
+	background: sandybrown;
+	height: 40px;
+	margin: .3em;
+	border-radius: 5%;
+}
+
+button.disabled{
+	background: lightgrey;
+}
+
+.hover:hover {
+	background: #F38630;
+	color: white;
+}
+
+:active {
+	outline: none;
+}
+
+:focus {
+	outline: none;
+}
+
+.seed {
+	background: #F38630;
+	color: white;
+}
+
+#result {
+	padding-top: 20px;
+	/*height: 40px;*/
+	font-size: 1.5em;
+}
+
+@media only screen and (min-device-width: 1000px) {
+	td {
+		width: 30px;
+		height: 30px;
+		line-height: 30px;
+		font-size: 30px;
+	}
+}

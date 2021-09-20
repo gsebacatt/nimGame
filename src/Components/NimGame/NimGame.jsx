@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {minimaxDepth, alphaBetaPruning} from "./nimFunctions";
 import '../../style.css';
-import {rl} from "./nimAiFunctions";
+import {rl, train} from "./nimAiFunctions";
 
 
 export default class NimGame extends Component {
@@ -11,7 +11,7 @@ export default class NimGame extends Component {
         this.state = {
             gameState: [],
             linesNumber: 0,
-            depth : 0,
+            depth: 0,
             currentRow: null,
             errorMessage: null,
             aiTurn: false,
@@ -19,6 +19,7 @@ export default class NimGame extends Component {
             result: null,
             algo: null,
             training: false,
+            performance: null
         }
     }
 
@@ -125,18 +126,28 @@ export default class NimGame extends Component {
         }, () => {
             //Ejecutar llamada a algoritmo, inicialmente minimax, luego parametrizado
 
-
+            let ai;
+            if (this.state.algo === "rl") {
+                //No queiro contar el tiempo de entrenamiento
+                ai = train(1000, this.state.gameState);
+            }
 
             let bestMove;
-            switch (this.state.algo){
+            let t0 = performance.now();
+            switch (this.state.algo) {
                 case "minimax":
                     bestMove = minimaxDepth(this.state.gameState, this.state.depth, true);
                     break;
                 case "alphabeta":
-                    bestMove = alphaBetaPruning(this.state.gameState,-10000,+10000, this.state.depth, true);
+                    bestMove = alphaBetaPruning(this.state.gameState, -10000, +10000, this.state.depth, true);
+                    break;
                 case "rl":
-                    bestMove = rl(this.state.gameState);
+                    console.log(ai);
+                    break;
+                    //bestMove = rl(ai, this.state.gameState);
             }
+
+            let t1 = performance.now()
 
             this.setState(state => {
                 const list = this.state.gameState.map((rowVal, index) => {
@@ -145,6 +156,7 @@ export default class NimGame extends Component {
                 return {
                     gameState: list,
                     aiTurn: false,
+                    performance: t1 - t0,
                 }
             }, () => {
                 if (this.gameFinished()) {
@@ -163,7 +175,8 @@ export default class NimGame extends Component {
             linesNumber: 0,
             gameState: [],
             result: null,
-            algo: null
+            algo: null,
+            performance: null,
         })
     }
 
@@ -194,11 +207,13 @@ export default class NimGame extends Component {
                 <h1>Nim</h1>
 
                 <div id="radio-selection" onChange={this.selectAlgo}>
-                        <input type="radio" value="minimax" name={"algo"} checked={this.state.algo === "minimax"}/> Minimax
-                        <input type="radio" value="alphabeta" name={"algo"} checked={this.state.algo === "alphabeta"}/> Poda Alfa Beta
-                        <input type="radio" value="rl" name={"algo"} checked={this.state.algo === "rl"}/> Reinforcement Learning
+                    <input type="radio" value="minimax" name={"algo"} checked={this.state.algo === "minimax"}/> Minimax
+                    <input type="radio" value="alphabeta" name={"algo"} checked={this.state.algo === "alphabeta"}/> Poda
+                    Alfa Beta
+                    <input type="radio" value="rl" name={"algo"} checked={this.state.algo === "rl"}/> Reinforcement
+                    Learning
                 </div>
-                <hr />
+                <hr/>
                 <div id='selection'>
                     Numero de Lineas :
                 </div>
@@ -222,7 +237,7 @@ export default class NimGame extends Component {
                 {(this.state.algo === "minimax" || this.state.algo === "alphabeta") && (
                     <p>
                         Profundidad:
-                        <input type="number" id="depth" onChange={this.submitDepth} />
+                        <input type="number" id="depth" onChange={this.submitDepth}/>
                     </p>
                 )}
                 <p>Estado del Juego: <span>{this.state.gameState.map(state => (<>{state} ,</>))}</span></p>
@@ -238,6 +253,11 @@ export default class NimGame extends Component {
                 <table>
                     {this.generateNim()}
                 </table>
+
+
+                {this.state.performance !== null && (
+                    <p>tiempo de IA : {this.state.performance} milisegundos</p>
+                )}
 
 
             </div>

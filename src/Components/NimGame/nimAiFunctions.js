@@ -1,5 +1,6 @@
 import {winning} from "./nimFunctions";
 import NimGame from "./NimGame";
+import _ from "lodash";
 
 export function train(n, state) {
 
@@ -8,8 +9,6 @@ export function train(n, state) {
 
     for (let i = 0; i < n; i++) {
         let game = new nimGame(state)
-
-        debugger;
 
         let last = {
             0: {"state": null, "action": null},
@@ -20,8 +19,9 @@ export function train(n, state) {
 
             let state = [...game.piles] //copia del game state
 
-            debugger;
             let action = player.choose_action(game, game.piles, true)
+
+            debugger;
 
             last[game.player]["state"] = state
             last[game.player]["action"] = action
@@ -30,6 +30,7 @@ export function train(n, state) {
             let new_state = [...game.piles];
 
             if (game.winner !== null) {
+                debugger;
                 player.update(state, action, new_state, -1, game)
                 player.update(last[game.player]["state"],
                     last[game.player]["action"],
@@ -37,6 +38,7 @@ export function train(n, state) {
                     1, game)
                 break;
             } else if (last[game.player]["state"] !== null) {
+                debugger;
                 player.update(
                     last[game.player]["state"],
                     last[game.player]["action"],
@@ -48,6 +50,7 @@ export function train(n, state) {
         }
     }
     console.log("training terminado")
+    debugger;
 
     //Retorna la IA entrenada
     return player;
@@ -60,6 +63,7 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
     this.epsilon = epsilon;
 
     this.update = (old_state, action, new_state, reward, game) => {
+        debugger;
         let old = this.get_q_value(old_state, action);
         let best_future = this.best_future_reward(new_state, game)
         this.update_q_value(old_state, action, old, reward, best_future)
@@ -75,14 +79,15 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
 
     //Aplicacion de formula de q_learning/softmax
     this.update_q_value = (state, action, old_q, reward, future_rewards) => {
-        this.q[{state, action}] = old_q + this.alpha * (reward + future_rewards - old_q)
+        debugger;
+        this.q[{state, action}] = old_q + this.alpha * (reward + future_rewards - old_q);
+        debugger;
     }
 
 
     this.best_future_reward = (state, game) => {
         let best_reward = 0;
 
-        debugger;
         game.available_actions([...state]).forEach(action => {
             best_reward = Math.max(this.get_q_value(state, action), best_reward);
         })
@@ -90,12 +95,11 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
         return best_reward;
 
     }
-    this.choose_action = (game, state, epsilon = true) => {
+    this.choose_action = (game, state, eps = true) => {
         let best_action = null;
         let best_reward = 0;
         let actions = game.available_actions([...state]);
 
-        debugger;
 
         actions.forEach(action => {
             if (best_action === null || this.get_q_value(state, action) > best_reward) {
@@ -104,23 +108,21 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
             }
         })
 
-        debugger;
 
-        if (epsilon) {
+        if (eps) {
             let weights = new Map();
             actions.forEach(action => {
                 if (action === best_action) {
-                    weights[action] = [1 - epsilon];
+                    weights[action] = [1 - this.epsilon];
                 } else {
-                    weights[action] = epsilon / (actions.length - 1)
+                    weights[action] = this.epsilon / (actions.size - 1)
                 }
             })
 
-            best_action = actions[Math.floor(Math.random() * actions.length)];
+            //best_action = actions[Math.floor(Math.random() * actions.length)];
+            best_action = getRandomKey(actions);
             //best_action  = weightedRandom(weights)
         }
-
-        debugger;
 
         console.log("choosen action: ");
         console.log(best_action);
@@ -142,8 +144,10 @@ function nimGame(initial = [1, 3, 5, 7]) {
         let actions = new Set();
 
         for (let i = 0; i < piles.length; i++) {
-            Array(piles).fill(0).forEach((_, j) => {
+            Array(piles[i]).fill(0).forEach((_, j) => {
+                j =  j + 1;
                 actions.add({i, j});
+                j = j - 1;
             })
         }
 
@@ -160,21 +164,24 @@ function nimGame(initial = [1, 3, 5, 7]) {
     }
 
     this.move = (action) => {
-        debugger;
-        const {pile, count} = action;
+        const {i,j} = action;
 
         if (this.winner !== null) {
             console.log('Juego terminado');
+            return;
         }
-        if (pile < 0 || pile >= this.piles.length) {
+        if (i < 0 || i >= this.piles.length) {
             console.log("pila invalida");
+            return;
+
+
         }
-        if (count < 1 || count > this.piles[pile]) {
+        if (j < 1 || j > this.piles[i]) {
             console.log("Numero de objetos no valido")
+            return;
         }
-
-
-        this.piles[pile] -= count;
+        debugger;
+        this.piles[i] -= j;
         this.switch_player();
 
         if (winning(this.piles)) {
@@ -202,4 +209,10 @@ function weightedRandom(prob) {
         sum += prob[i];
         if (r <= sum) return i;
     }
+}
+
+//For set or map
+function getRandomKey(collection) {
+    let keys = Array.from(collection.keys());
+    return keys[Math.floor(Math.random() * keys.length)];
 }

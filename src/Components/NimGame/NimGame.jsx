@@ -129,8 +129,7 @@ export default class NimGame extends Component {
             let ai;
             if (this.state.algo === "rl") {
                 //No queiro contar el tiempo de entrenamiento
-                ai = train(2, this.state.gameState);
-                debugger;
+                ai = train(10, this.state.gameState);
             }
 
             let bestMove;
@@ -149,6 +148,8 @@ export default class NimGame extends Component {
             }
 
             let t1 = performance.now()
+
+            debugger;
 
 
             this.setState(state => {

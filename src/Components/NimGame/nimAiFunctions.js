@@ -21,8 +21,6 @@ export function train(n, state) {
 
             let action = player.choose_action(game, game.piles, true)
 
-            debugger;
-
             last[game.player]["state"] = state
             last[game.player]["action"] = action
 
@@ -30,7 +28,6 @@ export function train(n, state) {
             let new_state = [...game.piles];
 
             if (game.winner !== null) {
-                debugger;
                 player.update(state, action, new_state, -1, game)
                 player.update(last[game.player]["state"],
                     last[game.player]["action"],
@@ -38,7 +35,6 @@ export function train(n, state) {
                     1, game)
                 break;
             } else if (last[game.player]["state"] !== null) {
-                debugger;
                 player.update(
                     last[game.player]["state"],
                     last[game.player]["action"],
@@ -50,7 +46,6 @@ export function train(n, state) {
         }
     }
     console.log("training terminado")
-    debugger;
 
     //Retorna la IA entrenada
     return player;
@@ -63,7 +58,6 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
     this.epsilon = epsilon;
 
     this.update = (old_state, action, new_state, reward, game) => {
-        debugger;
         let old = this.get_q_value(old_state, action);
         let best_future = this.best_future_reward(new_state, game)
         this.update_q_value(old_state, action, old, reward, best_future)
@@ -79,9 +73,8 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
 
     //Aplicacion de formula de q_learning/softmax
     this.update_q_value = (state, action, old_q, reward, future_rewards) => {
-        debugger;
-        this.q[{state, action}] = old_q + this.alpha * (reward + future_rewards - old_q);
-        debugger;
+        //this.q[{state, action}] = old_q + this.alpha * (reward + future_rewards - old_q);
+        this.q.set({state, action}, old_q + this.alpha * (reward + future_rewards - old_q))
     }
 
 
@@ -180,7 +173,6 @@ function nimGame(initial = [1, 3, 5, 7]) {
             console.log("Numero de objetos no valido")
             return;
         }
-        debugger;
         this.piles[i] -= j;
         this.switch_player();
 

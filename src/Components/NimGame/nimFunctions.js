@@ -12,10 +12,10 @@ export function minimaxDepth(game, depth, isMax) {
 
     //Terminal State check comes first
     //Tener en cuenta que este juego no se puede empatar, gana uno o el otro
-    if(depth === 0  || winning(game)){
-        if(isMax){
+    if (depth === 0 || winning(game)) {
+        if (isMax) {
             return {score: 10}
-        }else{
+        } else {
             return {score: -10}
         }
     }
@@ -38,7 +38,7 @@ export function minimaxDepth(game, depth, isMax) {
 
             console.log(game)
 
-            let result = minimaxDepth( game, depth - 1, !isMax);
+            let result = minimaxDepth(game, depth - 1, !isMax);
 
             move.score = result.score;
 
@@ -84,13 +84,13 @@ export function minimaxDepth(game, depth, isMax) {
 }
 
 /*Define quien gana si el juego es normal o misėre*/
-function winning(gameState) {
+export function winning(gameState) {
     let sum = 0;
     gameState.forEach(line => {
         sum += line;
     })
 
-   //console.log("sum: " + sum)
+    //console.log("sum: " + sum)
     if (
         sum === 0
     ) {
@@ -101,11 +101,11 @@ function winning(gameState) {
 }
 
 
-export function alphaBetaPruning(game, depth, alpha, beta, isMax){
-    if(depth === 0  || winning(game)){
-        if(isMax){
+export function alphaBetaPruning(game, depth, alpha, beta, isMax) {
+    if (depth === 0 || winning(game)) {
+        if (isMax) {
             return {score: 10}
-        }else{
+        } else {
             return {score: -10}
         }
     }
@@ -128,7 +128,7 @@ export function alphaBetaPruning(game, depth, alpha, beta, isMax){
 
             //Esto se hace para obtener el score de esta jugada
             //El objetivo de la poda es evitar buscar un score de antemano
-            let result = alphaBetaPruning( game, depth - 1,alpha, beta, !isMax);
+            let result = alphaBetaPruning(game, depth - 1, alpha, beta, !isMax);
 
             move.score = result.score;
 
@@ -150,7 +150,7 @@ export function alphaBetaPruning(game, depth, alpha, beta, isMax){
             if (moves[i].score > bestScore) {
                 bestScore = moves[i].score;
                 bestMove = i;
-                if(bestScore > beta){
+                if (bestScore > beta) {
                     break;
                 }
                 alpha = Math.max(alpha, bestScore)
@@ -162,7 +162,7 @@ export function alphaBetaPruning(game, depth, alpha, beta, isMax){
             if (moves[i].score < bestScore) {
                 bestScore = moves[i].score;
                 bestMove = i;
-                if(bestScore < alpha){
+                if (bestScore < alpha) {
                     break;
                 }
                 beta = Math.min(beta, bestScore)

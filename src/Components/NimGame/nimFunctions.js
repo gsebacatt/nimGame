@@ -110,66 +110,91 @@ export function alphaBetaPruning(game, depth, alpha, beta, isMax) {
         }
     }
 
+    //Move en este caso va a ser un array de de objetos (cada uno con un array game adentro)
     let moves = [];
 
+    //De cualquier forma necesito moves que sea un array con distintos states
+
+    //Este loop no sera recursivo, solo se obtendran los estados hijos del estado inicial
     for (let j = 0; j < game.length; j++) {
         Array(game[j]).fill(0).forEach((_, i) => {
-            let move = {}
+            let move = {game: [...game]};
+
             move.row = j;
-            move.amount = i + 1;
+            move.amount = i + 1; //Lo que se va a sacar de la fila j
 
-            console.log(game)
-            console.log(j)
-            console.log(i + 1)
+            move.game[j] = move.game[j] - move.amount;
 
-            game[j] = game[j] - move.amount;
-
-            console.log(game)
-
-            //Esto se hace para obtener el score de esta jugada
-            //El objetivo de la poda es evitar buscar un score de antemano
-            let result = alphaBetaPruning(game, depth - 1, alpha, beta, !isMax);
-
-            move.score = result.score;
-
-            //restore value
-            game[j] = game[j] + move.amount;
+            move.score = 0;
 
             moves.push(move);
-        });
+        })
     }
 
-    console.log("moves :  ")
-    console.log(moves)
 
-    let bestMove;
+    let bestMove = null;
+    let bestScore = isMax? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
 
-    if (isMax) {
-        let bestScore = -100000;
-        for (let i = 0; i < moves.length; i++) {
-            if (moves[i].score > bestScore) {
-                bestScore = moves[i].score;
-                bestMove = i;
-                if (bestScore > beta) {
-                    break;
-                }
-                alpha = Math.max(alpha, bestScore)
+    for (let i = 0; i < moves.length; i++) {
+        let value  = alphaBetaPruning(moves[i].game , depth - 1, alpha, beta, !isMax )
+
+        if(isMax){
+            if(value.score> bestScore){
+                bestScore = value;
+                bestMove  = moves[i];
             }
-        }
-    } else {
-        let bestScore = 100000;
-        for (let i = 0; i < moves.length; i++) {
-            if (moves[i].score < bestScore) {
-                bestScore = moves[i].score;
-                bestMove = i;
-                if (bestScore < alpha) {
-                    break;
-                }
-                beta = Math.min(beta, bestScore)
+
+            alpha = Math.max(alpha,value)
+        }else{
+            if(value.score < bestScore){
+                bestScore = value;
+                bestMove  = moves[i];
             }
+
+            beta = Math.min(beta,value)
         }
 
+        if (beta <= alpha) {
+            console.log('Prune', alpha, beta);
+            break;
+        }
     }
 
-    return moves[bestMove];
+    return bestMove
+
+    // if (isMax) {
+    //     let bestScore = -10000;
+    //     for (let i = 0; i < moves.length; i++) {
+    //
+    //         alpha = Math.max(alpha, alphaBetaPruning(move[i].game , depth - 1, alpha, beta, false ).score);
+    //         if(beta <= alpha)
+    //             break;
+    //
+    //         if (moves[i].score > bestScore) {
+    //             bestScore = moves[i].score;
+    //             bestMove = i;
+    //             if (bestScore > beta) {
+    //                 break;
+    //             }
+    //             alpha = Math.max(alpha, bestScore)
+    //         }
+    //     }
+    // } else {
+    //     let bestScore = 10000;
+    //     for (let i = 0; i < moves.length; i++) {
+    //         beta= Math.min(beta, alphaBetaPruning(move[i].game , depth - 1, alpha, beta, true ).score);
+    //         if(beta <= alpha)
+    //             break;
+    //         if (moves[i].score < bestScore) {
+    //             bestScore = moves[i].score;
+    //             bestMove = i;
+    //             if (bestScore < alpha) {
+    //                 break;
+    //             }
+    //             beta = Math.min(beta, bestScore)
+    //         }
+    //     }
+    //     return moves[bestMove];
+    //
+    // }
 }

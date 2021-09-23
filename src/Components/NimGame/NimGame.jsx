@@ -149,9 +149,6 @@ export default class NimGame extends Component {
 
             let t1 = performance.now()
 
-            debugger;
-
-
             this.setState(state => {
                 const list = this.state.gameState.map((rowVal, index) => {
                     return bestMove.row === index ? rowVal - bestMove.amount : rowVal;

@@ -19,7 +19,9 @@ export default class NimGame extends Component {
             result: null,
             algo: null,
             training: false,
-            performance: null
+            performance: null,
+            trains: null,
+            optimal: null,
         }
     }
 
@@ -41,6 +43,12 @@ export default class NimGame extends Component {
         this.setState({
             depth: +value.target.value,
             //gameState: new Array(Number(value.target.value)),
+        })
+    }
+
+    submitTrain = (value) => {
+        this.setState({
+            trains: +value.target.value,
         })
     }
 
@@ -128,8 +136,10 @@ export default class NimGame extends Component {
 
             let ai;
             if (this.state.algo === "rl") {
+                console.log("entrenamientos: ")
+                console.log(this.state.trains)
                 //No queiro contar el tiempo de entrenamiento
-                ai = train(100, this.state.gameState);
+                ai = train(this.state.trains, this.state.gameState);
                 console.log(" ai training: ")
                 console.log(ai)
             }
@@ -187,6 +197,22 @@ export default class NimGame extends Component {
         })
     }
 
+    checkOptimal = () => {
+        let optimal = this.optimal_move(this.state.gameState);
+
+        let row;
+        let amount;
+
+        if (optimal) {
+            row = optimal[0];
+            amount = optimal[1];
+
+            this.setState({
+                optimal: "fila: " + row + ", cantidad: " + amount,
+            })
+        }
+    }
+
     gameFinished = () => {
         let sum = 0;
         this.state.gameState.forEach(line => {
@@ -204,6 +230,16 @@ export default class NimGame extends Component {
         this.setState({
             algo: event.target.value,
         })
+    }
+
+    optimal_move = (stacks) => {
+        var stacks_xor = stacks.reduce((r, e) => r ^ e, 0);
+        var is_endgame = stacks.reduce((r, e) => r + (e > 1), 0) < 2;
+        var move = stacks.reduce((move, stack, i) => {
+            var take = stack - (is_endgame ^ stack ^ stacks_xor);
+            return take > move[1] ? [i, take] : move;
+        }, [0, 0]);
+        return move[1] > 0 ? move : undefined;
     }
 
 
@@ -237,8 +273,19 @@ export default class NimGame extends Component {
                         </button>
                         <button className={"hover"} disabled={!aiTurn}>IA</button>
                         <button className={"hover"} onClick={this.resetGame}>Reset</button>
+                        <button className={"hover"} onClick={this.checkOptimal}>Optimal</button>
                     </>
                 )}
+
+                {this.state.algo === "rl" && (
+                    <p>
+                        Entrenamientos:
+                        <input type="number" id="depth" onChange={this.submitTrain}/>
+                    </p>
+                )}
+
+                {console.log(this.state.optimal)}
+                {this.state.optimal && <p>Movimiento Optimo: {this.state.optimal}</p>}
 
 
                 {(this.state.algo === "minimax" || this.state.algo === "alphabeta") && (

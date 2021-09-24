@@ -78,13 +78,16 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
     //Aplicacion de formula de q_learning/softmax
     this.update_q_value = (state, action, old_q, reward, future_rewards) => {
 
-        let key = state.toString() + JSON.stringify(action);
-        //console.log(key)
+        if (state) {
+            let key = state.toString() + JSON.stringify(action);
+            //console.log(key)
 
-        q.set(key, old_q + this.alpha * (reward + future_rewards - old_q))
+            q.set(key, old_q + this.alpha * (reward + future_rewards - old_q))
 
-        //console.log("after update q value: ")
-        //console.log(q)
+            //console.log("after update q value: ")
+            //console.log(q)
+        }
+
 
     }
 
@@ -235,7 +238,7 @@ export function rl(ai, gameState) {
                 best_reward = q.get(key);
                 best_action = action;
             }
-        }else{
+        } else {
             //considerar casos donde no se cargo entonces tener inicializado a cero
         }
     })

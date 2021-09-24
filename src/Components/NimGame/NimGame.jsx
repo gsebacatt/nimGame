@@ -152,7 +152,7 @@ export default class NimGame extends Component {
                     bestMove = minimaxDepth(this.state.gameState, this.state.depth, true);
                     break;
                 case "alphabeta":
-                    bestMove = alphaBetaPruning(this.state.gameState, -10000, +10000, this.state.depth, true);
+                    bestMove = alphaBetaPruning(this.state.gameState, this.state.depth,-10000, +10000, true);
                     break;
                 case "rl":
                     console.log(ai);

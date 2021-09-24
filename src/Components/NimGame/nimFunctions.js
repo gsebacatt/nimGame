@@ -100,7 +100,6 @@ export function winning(gameState) {
     }
 }
 
-
 export function alphaBetaPruning(game, depth, alpha, beta, isMax) {
     if (depth === 0 || winning(game)) {
         if (isMax) {
@@ -131,27 +130,39 @@ export function alphaBetaPruning(game, depth, alpha, beta, isMax) {
         })
     }
 
+    console.log("alphaBeta moves: ")
+    console.log(moves)
+
 
     let bestMove = null;
     let bestScore = isMax? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
 
     for (let i = 0; i < moves.length; i++) {
-        let value  = alphaBetaPruning(moves[i].game , depth - 1, alpha, beta, !isMax )
+
 
         if(isMax){
+            let value  = alphaBetaPruning(moves[i].game , depth - 1, alpha, beta, !isMax )
+            alpha = Math.max(alpha,value.score)
+            // if (beta <= alpha)
+            //     return alpha
+            // return alpha
+
+
             if(value.score> bestScore){
                 bestScore = value;
                 bestMove  = moves[i];
             }
 
-            alpha = Math.max(alpha,value)
         }else{
+            let value = alphaBetaPruning(moves[i].game , depth - 1, alpha, beta, isMax )
+            beta = Math.min(beta,value.score)
             if(value.score < bestScore){
                 bestScore = value;
                 bestMove  = moves[i];
             }
-
-            beta = Math.min(beta,value)
+            // if (beta <= alpha)
+            //     return beta
+            // return beta
         }
 
         if (beta <= alpha) {
@@ -159,6 +170,9 @@ export function alphaBetaPruning(game, depth, alpha, beta, isMax) {
             break;
         }
     }
+
+    console.log("alphaBeta bestMove: ")
+    console.log(bestMove)
 
     return bestMove;
 }

@@ -143,9 +143,12 @@ export default class NimGame extends Component {
                     break;
                 case "rl":
                     console.log(ai);
+                    bestMove = rl(ai, this.state.gameState);
                     break;
-                    //bestMove = rl(ai, this.state.gameState);
             }
+
+
+            debugger;
 
             let t1 = performance.now()
 

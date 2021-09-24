@@ -160,41 +160,5 @@ export function alphaBetaPruning(game, depth, alpha, beta, isMax) {
         }
     }
 
-    return bestMove
-
-    // if (isMax) {
-    //     let bestScore = -10000;
-    //     for (let i = 0; i < moves.length; i++) {
-    //
-    //         alpha = Math.max(alpha, alphaBetaPruning(move[i].game , depth - 1, alpha, beta, false ).score);
-    //         if(beta <= alpha)
-    //             break;
-    //
-    //         if (moves[i].score > bestScore) {
-    //             bestScore = moves[i].score;
-    //             bestMove = i;
-    //             if (bestScore > beta) {
-    //                 break;
-    //             }
-    //             alpha = Math.max(alpha, bestScore)
-    //         }
-    //     }
-    // } else {
-    //     let bestScore = 10000;
-    //     for (let i = 0; i < moves.length; i++) {
-    //         beta= Math.min(beta, alphaBetaPruning(move[i].game , depth - 1, alpha, beta, true ).score);
-    //         if(beta <= alpha)
-    //             break;
-    //         if (moves[i].score < bestScore) {
-    //             bestScore = moves[i].score;
-    //             bestMove = i;
-    //             if (bestScore < alpha) {
-    //                 break;
-    //             }
-    //             beta = Math.min(beta, bestScore)
-    //         }
-    //     }
-    //     return moves[bestMove];
-    //
-    // }
+    return bestMove;
 }

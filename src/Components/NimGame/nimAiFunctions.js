@@ -66,7 +66,7 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
     }
 
     this.get_q_value = (state, action) => {
-        let key  = state.toString() + JSON.stringify(action);
+        let key = state.toString() + JSON.stringify(action);
 
         if (q.get(key)) {
             return q.get(key) //No estoy seguro de esta sintaxis
@@ -78,13 +78,13 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
     //Aplicacion de formula de q_learning/softmax
     this.update_q_value = (state, action, old_q, reward, future_rewards) => {
 
-        let key  = state.toString() + JSON.stringify(action);
-        console.log(key)
+        let key = state.toString() + JSON.stringify(action);
+        //console.log(key)
 
         q.set(key, old_q + this.alpha * (reward + future_rewards - old_q))
 
-        console.log("after update q value: ")
-        console.log(q)
+        //console.log("after update q value: ")
+        //console.log(q)
 
     }
 
@@ -203,8 +203,32 @@ function nimGame(initial = [1, 3, 5, 7]) {
     }
 }
 
-export function rl(gameState) {
-    return {};
+/*Esta funcion debe retornar el best move almacenado en q
+* para todas las jugadas disponibles en este turno*/
+export function rl(ai, gameState) {
+    //obtener todos los actions available de un gameState
+
+    let game = new nimGame(gameState);
+
+    //Retorna un set
+    let actions = game.available_actions([...gameState]);
+
+    let best_reward = Number.NEGATIVE_INFINITY;
+    let best_action = {row: 0, amount: 0};
+
+    actions.forEach(action => {
+        let key = gameState.toString() + JSON.stringify(action);
+
+        //buscar este key dentro de q
+        if (q.get(key)) {
+            if (q.get(key) > best_reward) {
+                best_reward = q.get(key);
+                best_action = action;
+            }
+        }
+
+    })
+    return {row: best_action.i, amount: best_action.j};
 }
 
 

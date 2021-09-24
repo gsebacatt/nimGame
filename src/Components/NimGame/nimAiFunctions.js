@@ -2,6 +2,10 @@ import {winning} from "./nimFunctions";
 import NimGame from "./NimGame";
 import _ from "lodash";
 
+
+//Map permite keys de cualquier tipo
+let q = new Map();
+
 export function train(n, state) {
 
     let player = new nimAi()
@@ -42,7 +46,6 @@ export function train(n, state) {
                     0, game
                 )
             }
-
         }
     }
     console.log("training terminado")
@@ -52,10 +55,9 @@ export function train(n, state) {
 }
 
 function nimAi(alpha = 0.5, epsilon = 0.1) {
-
-    this.q = new Map(); //la tabla q, seria un diccionario, map de ES6, permite keys as objeects
     this.alpha = alpha;
     this.epsilon = epsilon;
+    this.q = q;
 
     this.update = (old_state, action, new_state, reward, game) => {
         let old = this.get_q_value(old_state, action);
@@ -64,8 +66,10 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
     }
 
     this.get_q_value = (state, action) => {
-        if (this.q[{state, action}]) {
-            return this.q[{state, action}] //No estoy seguro de esta sintaxis
+        let key  = state.toString() + JSON.stringify(action);
+
+        if (q.get(key)) {
+            return q.get(key) //No estoy seguro de esta sintaxis
         } else {
             return 0;
         }
@@ -73,8 +77,15 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
 
     //Aplicacion de formula de q_learning/softmax
     this.update_q_value = (state, action, old_q, reward, future_rewards) => {
-        //this.q[{state, action}] = old_q + this.alpha * (reward + future_rewards - old_q);
-        this.q.set({state, action}, old_q + this.alpha * (reward + future_rewards - old_q))
+
+        let key  = state.toString() + JSON.stringify(action);
+        console.log(key)
+
+        q.set(key, old_q + this.alpha * (reward + future_rewards - old_q))
+
+        console.log("after update q value: ")
+        console.log(q)
+
     }
 
 
@@ -90,35 +101,45 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
     }
     this.choose_action = (game, state, eps = true) => {
         let best_action = null;
-        let best_reward = 0;
-        let actions = game.available_actions([...state]);
+        //Convertir a array el set devuelto paa poder usar con la funcion random
+        let actions = Array.from(game.available_actions([...state]));
 
+        //Codigo anterior, necesita una opcion para random weighted
+        // actions.forEach(action => {
+        //     if (best_action === null || this.get_q_value(state, action) > best_reward) {
+        //         best_reward = this.get_q_value(state, action);
+        //         best_action = action;
+        //     }
+        // })
+        //
+        //
+        // if (eps) {
+        //     let weights = new Map();
+        //     actions.forEach(action => {
+        //         if (action === best_action) {
+        //             weights[action] = [1 - this.epsilon];
+        //         } else {
+        //             weights[action] = this.epsilon / (actions.size - 1)
+        //         }
+        //     })
+        //
+        // }
+
+        if (eps && Math.random() <= this.epsilon) {
+            return getRandomSubarray(actions, 1)[0];
+        }
+
+        let best_reward = Number.NEGATIVE_INFINITY;
 
         actions.forEach(action => {
-            if (best_action === null || this.get_q_value(state, action) > best_reward) {
+            if (this.get_q_value(state, action) > best_reward) {
                 best_reward = this.get_q_value(state, action);
                 best_action = action;
             }
         })
 
-
-        if (eps) {
-            let weights = new Map();
-            actions.forEach(action => {
-                if (action === best_action) {
-                    weights[action] = [1 - this.epsilon];
-                } else {
-                    weights[action] = this.epsilon / (actions.size - 1)
-                }
-            })
-
-            //best_action = actions[Math.floor(Math.random() * actions.length)];
-            best_action = getRandomKey(actions);
-            //best_action  = weightedRandom(weights)
-        }
-
-        console.log("choosen action: ");
-        console.log(best_action);
+        // console.log("choosen action: ");
+        // console.log(best_action);
 
         return best_action;
     }
@@ -127,7 +148,7 @@ function nimAi(alpha = 0.5, epsilon = 0.1) {
 //Para el entrenamiento nimGame deberia recibir el estado del juego
 //solicitado por el usuario en nimGame.jsx, (1,3,5,7) es solo un placeholder
 function nimGame(initial = [1, 3, 5, 7]) {
-    console.log("nim training game : " + initial)
+    //console.log("nim training game : " + initial)
     this.player = 0;
     this.piles = [...initial];
     this.winner = null;
@@ -138,7 +159,7 @@ function nimGame(initial = [1, 3, 5, 7]) {
 
         for (let i = 0; i < piles.length; i++) {
             Array(piles[i]).fill(0).forEach((_, j) => {
-                j =  j + 1;
+                j = j + 1;
                 actions.add({i, j});
                 j = j - 1;
             })
@@ -157,7 +178,7 @@ function nimGame(initial = [1, 3, 5, 7]) {
     }
 
     this.move = (action) => {
-        const {i,j} = action;
+        const {i, j} = action;
 
         if (this.winner !== null) {
             console.log('Juego terminado');
@@ -186,25 +207,30 @@ export function rl(gameState) {
     return {};
 }
 
-function randomChoice(p) {
-    let rnd = p.reduce((a, b) => a + b) * Math.random();
-    return p.findIndex(a => (rnd -= a) < 0);
-}
 
-function randomChoices(p, count) {
-    return Array.from(Array(count), randomChoice.bind(null, p));
-}
-
-function weightedRandom(prob) {
-    let i, sum = 0, r = Math.random();
-    for (i in prob) {
-        sum += prob[i];
-        if (r <= sum) return i;
+//Helper functions
+function getRandomSubarray(arr, size) {
+    var shuffled = arr.slice(0), i = arr.length, temp, index;
+    while (i--) {
+        index = Math.floor((i + 1) * Math.random());
+        temp = shuffled[index];
+        shuffled[index] = shuffled[i];
+        shuffled[i] = temp;
     }
+    return shuffled.slice(0, size);
 }
 
-//For set or map
-function getRandomKey(collection) {
-    let keys = Array.from(collection.keys());
-    return keys[Math.floor(Math.random() * keys.length)];
+function weightedRand(spec) {
+    var i, j, table = [];
+    for (i in spec) {
+        // The constant 10 below should be computed based on the
+        // weights in the spec for a correct and optimal table size.
+        // E.g. the spec {0:0.999, 1:0.001} will break this impl.
+        for (j = 0; j < spec[i] * 10; j++) {
+            table.push(i);
+        }
+    }
+    return function () {
+        return table[Math.floor(Math.random() * table.length)];
+    }
 }

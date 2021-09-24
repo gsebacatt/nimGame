@@ -216,8 +216,18 @@ export function rl(ai, gameState) {
     let best_reward = Number.NEGATIVE_INFINITY;
     let best_action = {row: 0, amount: 0};
 
+    console.log(actions)
+
     actions.forEach(action => {
         let key = gameState.toString() + JSON.stringify(action);
+        console.log("gameState: ");
+        console.log(gameState);
+
+        console.log("key: ")
+        console.log(key)
+
+        console.log("tabular q[key] value:")
+        console.log(q.get(key))
 
         //buscar este key dentro de q
         if (q.get(key)) {
@@ -225,9 +235,17 @@ export function rl(ai, gameState) {
                 best_reward = q.get(key);
                 best_action = action;
             }
+        }else{
+            //considerar casos donde no se cargo entonces tener inicializado a cero
         }
-
     })
+
+    console.log("best_reward: ")
+    console.log(best_reward)
+
+    console.log(best_action)
+    console.log(best_action)
+
     return {row: best_action.i, amount: best_action.j};
 }
 
